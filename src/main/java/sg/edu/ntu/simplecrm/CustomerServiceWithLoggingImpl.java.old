@@ -1,0 +1,71 @@
+package sg.edu.ntu.simplecrm;
+
+import java.util.ArrayList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CustomerServiceWithLoggingImpl implements CustomerService {
+
+  private final Logger logger = LoggerFactory.getLogger(CustomerServiceWithLoggingImpl.class);
+
+  // private CustomerRepository customerRepository = new CustomerRepository();
+  // @Autowired
+  private CustomerRepository customerRepository;
+
+  @Autowired
+  public CustomerServiceWithLoggingImpl(CustomerRepository customerRepository) {
+    this.customerRepository = customerRepository;
+  }
+
+  // Create
+  @Override
+  public Customer createCustomer(Customer customer) {
+    Customer newCustomer = customerRepository.createCustomer(customer);
+    return newCustomer;
+  }
+
+  // Get One
+  @Override
+  public Customer getCustomer(String id) {
+    int foundIndex = getCustomerIndex(id);
+    return customerRepository.getCustomer(foundIndex);
+
+  }
+
+  // Get All
+  @Override
+  public ArrayList<Customer> getAllCustomers() {
+    logger.info("CustomerServiceWithLoggingImpl.getAllCustomers called ✅");
+    return customerRepository.getAllCustomers();
+  }
+
+  // Update
+  @Override
+  public Customer updateCustomer(String id, Customer customer) {
+    return customerRepository.updateCustomer(getCustomerIndex(id), customer);
+  }
+
+  // Delete
+  @Override
+  public void deleteCustomer(String id) {
+    customerRepository.deleteCustomer(getCustomerIndex(id));
+  }
+
+  // Helper
+  private int getCustomerIndex(String id) {
+
+    for (Customer customer : customerRepository.getAllCustomers()) {
+      if (customer.getId().equals(id)) {
+        return customerRepository.getAllCustomers().indexOf(customer);
+      }
+    }
+
+    throw new CustomerNotFoundException(id);
+  }
+
+}
